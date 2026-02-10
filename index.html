@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notepad Pro | Editor Minimalista</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Open+Sans:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="app-title">
+                    <i class="fas fa-sticky-note"></i> Notepad Pro
+                </h1>
+                <button id="new-note-btn" class="btn btn-primary" title="Crear nueva nota">
+                    <i class="fas fa-plus"></i> Nueva nota
+                </button>
+            </div>
+
+            <!-- Buscador -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="note-search" class="search-input" placeholder="Buscar notas...">
+            </div>
+
+            <!-- Lista de notas -->
+            <div class="notes-list-container">
+                <h3 class="section-title">Tus notas <span id="notes-count" class="badge">0</span></h3>
+                <ul id="notes-list" class="notes-list">
+                    <!-- Las notas se cargarán dinámicamente aquí -->
+                </ul>
+            </div>
+
+            <!-- Configuración -->
+            <div class="settings-container">
+                <h3 class="section-title">Configuración</h3>
+                <div class="setting-group">
+                    <label for="font-selector">Fuente:</label>
+                    <select id="font-selector" class="font-selector">
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label for="font-size">Tamaño: <span id="font-size-value">18px</span></label>
+                    <input type="range" id="font-size" min="16" max="32" value="18" class="font-slider">
+                </div>
+            </div>
+        </aside>
+
+        <!-- Editor principal -->
+        <main class="main-content">
+            <div class="editor-header">
+                <input type="text" id="note-title" class="note-title-input" placeholder="Título de la nota" maxlength="100">
+                <div class="editor-actions">
+                    <button id="save-note-btn" class="btn btn-success" title="Guardar">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button id="export-note-btn" class="btn btn-secondary" title="Exportar como .txt">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button id="delete-note-btn" class="btn btn-danger" title="Eliminar nota">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+
+            <div class="editor-container">
+                <textarea id="note-editor" class="note-editor" placeholder="Comienza a escribir aquí..."></textarea>
+            </div>
+
+            <div class="editor-footer">
+                <div class="footer-info">
+                    <span id="char-count">0 caracteres</span>
+                    <span id="word-count">0 palabras</span>
+                </div>
+                <div class="footer-status">
+                    <span id="save-status" class="status-saved">
+                        <i class="fas fa-check-circle"></i> Guardado
+                    </span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="storage.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
