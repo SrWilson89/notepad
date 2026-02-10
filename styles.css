@@ -7,7 +7,7 @@
     --text-primary: #f8fafc;
     --text-secondary: #cbd5e1;
     --text-tertiary: #94a3b8;
-    --accent-primary: #3b82f6;
+    --accent-primary: #3b82f6; /* Azul por defecto */
     --accent-primary-hover: #2563eb;
     --accent-success: #10b981;
     --accent-danger: #ef4444;
@@ -35,6 +35,32 @@
     /* Transiciones */
     --transition-fast: 150ms ease;
     --transition-normal: 250ms ease;
+}
+
+/* ===================== TEMAS DINÁMICOS ===================== */
+
+/* Tema Azul (por defecto) */
+.theme-blue {
+    --accent-primary: #3b82f6;
+    --accent-primary-hover: #2563eb;
+}
+
+/* Tema Verde */
+.theme-green {
+    --accent-primary: #10b981;
+    --accent-primary-hover: #0da271;
+}
+
+/* Tema Naranja */
+.theme-orange {
+    --accent-primary: #f59e0b;
+    --accent-primary-hover: #d97706;
+}
+
+/* Tema Rosa */
+.theme-pink {
+    --accent-primary: #ec4899;
+    --accent-primary-hover: #db2777;
 }
 
 /* Reset y estilos base */
@@ -182,7 +208,6 @@ body {
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-secondary);
-    margin-bottom: var(--spacing-sm);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -320,6 +345,108 @@ body {
     border: none;
 }
 
+/* Selector de temas */
+.theme-selector-container {
+    display: flex;
+    flex-direction: row;    /* Alinea título y opciones en la misma línea */
+    align-items: center;    /* Centra verticalmente el texto con los círculos */
+    gap: 25px;              /* Espacio entre el título y el grupo de colores */
+}
+
+.theme-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.theme-option {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all var(--transition-fast);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.theme-option.active {
+    border-color: var(--text-primary);
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+.theme-option.active::after {
+    content: '✓';
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.theme-option[data-theme="blue"] {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+}
+
+.theme-option[data-theme="green"] {
+    background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.theme-option[data-theme="orange"] {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.theme-option[data-theme="pink"] {
+    background: linear-gradient(135deg, #ec4899, #f472b6);
+}
+
+/* Aplicar color de acento a elementos específicos */
+.btn-primary {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-primary-hover);
+}
+
+.badge {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+.note-item.active {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+.search-input:focus,
+.note-title-input:focus,
+.font-selector:focus {
+    border-color: var(--accent-primary);
+}
+
+.font-slider::-webkit-slider-thumb {
+    background: var(--accent-primary);
+}
+
+.font-slider::-moz-range-thumb {
+    background: var(--accent-primary);
+}
+
+/* Color del cursor en el editor */
+.note-editor {
+    caret-color: var(--accent-primary);
+}
+
 /* Área principal del editor */
 .main-content {
     flex: 1;
@@ -452,6 +579,11 @@ body {
     
     .editor-actions {
         justify-content: center;
+    }
+    
+    .theme-options {
+        grid-template-columns: repeat(4, 1fr);
+        justify-items: center;
     }
 }
 

@@ -9,30 +9,56 @@ let domRefs = {};
  * Inicializa las referencias a elementos del DOM
  */
 function initializeDOMReferences() {
-    domRefs = {
-        // Sidebar
-        newNoteBtn: document.getElementById('new-note-btn'),
-        noteSearch: document.getElementById('note-search'),
-        notesList: document.getElementById('notes-list'),
-        notesCount: document.getElementById('notes-count'),
-        
-        // Configuración
-        fontSelector: document.getElementById('font-selector'),
-        fontSizeSlider: document.getElementById('font-size'),
-        fontSizeValue: document.getElementById('font-size-value'),
-        
-        // Editor
-        noteTitle: document.getElementById('note-title'),
-        noteEditor: document.getElementById('note-editor'),
-        saveNoteBtn: document.getElementById('save-note-btn'),
-        deleteNoteBtn: document.getElementById('delete-note-btn'),
-        exportNoteBtn: document.getElementById('export-note-btn'),
-        
-        // Footer
-        charCount: document.getElementById('char-count'),
-        wordCount: document.getElementById('word-count'),
-        saveStatus: document.getElementById('save-status')
-    };
+    console.log('Initializing DOM references...');
+    
+    // Lista de IDs de elementos a buscar
+    const elementIds = [
+        'new-note-btn',
+        'note-search',
+        'notes-list',
+        'notes-count',
+        'font-selector',
+        'font-size',
+        'font-size-value',
+        'note-title',
+        'note-editor',
+        'save-note-btn',
+        'delete-note-btn',
+        'export-note-btn',
+        'char-count',
+        'word-count',
+        'save-status'
+    ];
+    
+    // Inicializar todas las referencias
+    elementIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            domRefs[id] = element;
+        } else {
+            console.warn(`Element with id "${id}" not found`);
+        }
+    });
+    
+    // Alias para acceder más fácilmente
+    domRefs.newNoteBtn = domRefs['new-note-btn'];
+    domRefs.noteSearch = domRefs['note-search'];
+    domRefs.notesList = domRefs['notes-list'];
+    domRefs.notesCount = domRefs['notes-count'];
+    domRefs.fontSelector = domRefs['font-selector'];
+    domRefs.fontSizeSlider = domRefs['font-size'];
+    domRefs.fontSizeValue = domRefs['font-size-value'];
+    domRefs.noteTitle = domRefs['note-title'];
+    domRefs.noteEditor = domRefs['note-editor'];
+    domRefs.saveNoteBtn = domRefs['save-note-btn'];
+    domRefs.deleteNoteBtn = domRefs['delete-note-btn'];
+    domRefs.exportNoteBtn = domRefs['export-note-btn'];
+    domRefs.charCount = domRefs['char-count'];
+    domRefs.wordCount = domRefs['word-count'];
+    domRefs.saveStatus = domRefs['save-status'];
+    
+    console.log('DOM references initialized. Found:', Object.keys(domRefs).length - elementIds.length, 'elements');
+    return domRefs;
 }
 
 /**
@@ -41,9 +67,13 @@ function initializeDOMReferences() {
  * @param {string} activeNoteId - ID de la nota activa
  */
 function renderNotesList(notes, activeNoteId) {
-    const { notesList, notesCount } = domRefs;
+    const notesList = domRefs.notesList;
+    const notesCount = domRefs.notesCount;
     
-    if (!notesList) return;
+    if (!notesList) {
+        console.error('notesList element not found');
+        return;
+    }
     
     // Actualizar contador
     if (notesCount) {
@@ -97,6 +127,11 @@ function renderNotesList(notes, activeNoteId) {
  * @param {Object} note - Objeto de nota
  */
 function loadNoteIntoEditor(note) {
+    if (!domRefs.noteTitle || !domRefs.noteEditor) {
+        console.error('Editor elements not found');
+        return;
+    }
+    
     if (!note) {
         domRefs.noteTitle.value = '';
         domRefs.noteEditor.value = '';
@@ -119,6 +154,10 @@ function loadNoteIntoEditor(note) {
  * Actualiza los contadores de palabras y caracteres
  */
 function updateWordCount() {
+    if (!domRefs.noteEditor || !domRefs.wordCount || !domRefs.charCount) {
+        return;
+    }
+    
     const content = domRefs.noteEditor.value;
     const words = content.trim() ? content.trim().split(/\s+/).length : 0;
     const chars = content.length;
@@ -132,7 +171,7 @@ function updateWordCount() {
  * @param {boolean} saved - true si está guardado, false si hay cambios sin guardar
  */
 function updateSaveStatus(saved) {
-    const { saveStatus } = domRefs;
+    const saveStatus = domRefs.saveStatus;
     
     if (!saveStatus) return;
     
@@ -256,6 +295,84 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
+/**
+ * Aplica un tema específico al documento
+ * @param {string} themeName - Nombre del tema (blue, green, orange, pink)
+ */
+function applyTheme(themeName) {
+    // Remover todas las clases de tema existentes
+    document.body.classList.remove('theme-blue', 'theme-green', 'theme-orange', 'theme-pink');
+    
+    // Aplicar la nueva clase de tema
+    document.body.classList.add(`theme-${themeName}`);
+    
+    // Actualizar estado activo en los selectores
+    updateThemeSelectors(themeName);
+}
+
+/**
+ * Actualiza los selectores de tema para marcar el activo
+ * @param {string} activeTheme - Nombre del tema activo
+ */
+function updateThemeSelectors(activeTheme) {
+    const themeOptions = document.querySelectorAll('.theme-option');
+    
+    themeOptions.forEach(option => {
+        const themeName = option.dataset.theme;
+        
+        if (themeName === activeTheme) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Inicializa los event listeners para los selectores de tema
+ */
+function initializeThemeSelectors() {
+    const themeOptions = document.querySelectorAll('.theme-option');
+    
+    if (themeOptions.length === 0) {
+        console.error('No theme options found');
+        return;
+    }
+    
+    themeOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const themeName = this.dataset.theme;
+            
+            // Aplicar tema visualmente
+            applyTheme(themeName);
+            
+            // Guardar tema en localStorage
+            if (window.Storage && window.Storage.saveTheme) {
+                window.Storage.saveTheme(themeName);
+            }
+            
+            // Mostrar notificación
+            showNotification(`Tema cambiado a ${getThemeDisplayName(themeName)}`, 'success');
+        });
+    });
+}
+
+/**
+ * Obtiene el nombre para mostrar del tema
+ * @param {string} themeName - Nombre interno del tema
+ * @returns {string} Nombre para mostrar
+ */
+function getThemeDisplayName(themeName) {
+    const themeNames = {
+        'blue': 'Azul',
+        'green': 'Verde',
+        'orange': 'Naranja',
+        'pink': 'Rosa'
+    };
+    
+    return themeNames[themeName] || themeName;
+}
+
 // Exportar funciones para uso en otros módulos
 window.UI = {
     initializeDOMReferences,
@@ -266,5 +383,7 @@ window.UI = {
     applyFontSettings,
     downloadAsText,
     showNotification,
+    applyTheme,
+    initializeThemeSelectors,
     domRefs
 };

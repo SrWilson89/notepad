@@ -106,7 +106,7 @@ function deleteNote(id) {
     const notes = getAllNotes();
     const filteredNotes = notes.filter(note => note.id !== id);
     
-    if (filterNotes.length === notes.length) {
+    if (filteredNotes.length === notes.length) {
         return false; // No se encontró la nota
     }
     
@@ -167,6 +167,35 @@ function saveUserSettings(settings) {
     }
 }
 
+/**
+ * Obtiene el tema guardado del usuario
+ * @returns {string} Nombre del tema (blue, green, orange, pink)
+ */
+function getSavedTheme() {
+    try {
+        const theme = localStorage.getItem('notepadProTheme');
+        return theme || 'blue'; // Tema azul por defecto
+    } catch (error) {
+        console.error('Error al cargar el tema:', error);
+        return 'blue';
+    }
+}
+
+/**
+ * Guarda el tema seleccionado por el usuario
+ * @param {string} themeName - Nombre del tema a guardar
+ * @returns {boolean} true si se guardó correctamente
+ */
+function saveTheme(themeName) {
+    try {
+        localStorage.setItem('notepadProTheme', themeName);
+        return true;
+    } catch (error) {
+        console.error('Error al guardar el tema:', error);
+        return false;
+    }
+}
+
 // Exportar funciones para uso en otros módulos
 window.Storage = {
     getAllNotes,
@@ -176,5 +205,7 @@ window.Storage = {
     deleteNote,
     searchNotes,
     getUserSettings,
-    saveUserSettings
+    saveUserSettings,
+    getSavedTheme,
+    saveTheme
 };
