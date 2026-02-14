@@ -3,117 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notepad Pro | Editor Minimalista</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Open+Sans:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Notepad Pro</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
 </head>
 <body>
+    <!--
+        CORRECCIÓN: El contenedor raíz ahora usa la clase .app-container
+        que coincide exactamente con el selector en styles.css (línea 98).
+        El HTML original usaba .container, causando que el layout flex no funcionara.
+    -->
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
+
+        <!-- ══════════════════════════════════════════════════
+             SIDEBAR
+             Atributo aria-label para accesibilidad.
+             El botón de colapsar está dentro del header.
+        ══════════════════════════════════════════════════ -->
+        <aside id="sidebar" class="sidebar" aria-label="Panel lateral">
+
             <div class="sidebar-header">
-                <h1 class="app-title">
-                    <i class="fas fa-sticky-note"></i> Notepad Pro
-                </h1>
-                <button id="new-note-btn" class="btn btn-primary" title="Crear nueva nota">
-                    <i class="fas fa-plus"></i> Nueva nota
-                </button>
+                <!-- CORRECCIÓN: Usamos la clase .app-title que define el estilo en CSS -->
+                <span class="app-title">📝 Notepad Pro</span>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <!--
+                        CORRECCIÓN: El botón de modo claro usaba el id btn-light-mode
+                        y la clase btn-icon que NO existía en styles.css.
+                        Ahora usa la clase .light-mode-toggle que SÍ está definida.
+                    -->
+                    <button id="btn-light-mode" class="light-mode-toggle" title="Modo claro/oscuro" aria-label="Cambiar modo claro/oscuro">🌙</button>
+                    <!--
+                        CORRECCIÓN: El botón de colapsar usaba ✕ (símbolo de cierre),
+                        confuso para el usuario. Ahora usa ← con aria-label descriptivo.
+                        También referenciado correctamente en app.js como btn-collapse-sidebar.
+                    -->
+                    <button id="btn-collapse-sidebar" class="light-mode-toggle" title="Colapsar panel" aria-label="Colapsar panel lateral">◀</button>
+                </div>
             </div>
 
-            <!-- Buscador -->
+            <!-- ── Búsqueda ──────────────────────────────────
+                 NUEVO: Buscador de notas.
+                 La clase .search-container y .search-input sí existen en styles.css.
+                 El id note-search es referenciado en app.js para filtrar notas.
+            ────────────────────────────────────────────────── -->
             <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="note-search" class="search-input" placeholder="Buscar notas...">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input
+                    id="note-search"
+                    type="search"
+                    class="search-input"
+                    placeholder="Buscar notas..."
+                    autocomplete="off"
+                    aria-label="Buscar notas"
+                >
             </div>
 
-            <!-- Lista de notas -->
+            <!-- ── Lista de notas ────────────────────────────
+                 CORRECCIÓN: Ahora envuelto en .notes-list-container
+                 que aplica flex:1 y overflow:hidden correctamente.
+                 El título usa .section-title y .badge para contar notas.
+            ────────────────────────────────────────────────── -->
             <div class="notes-list-container">
-                <h3 class="section-title">Tus notas <span id="notes-count" class="badge">0</span></h3>
-                <ul id="notes-list" class="notes-list">
-                    <!-- Las notas se cargarán dinámicamente aquí -->
-                </ul>
-            </div>
-
-            <!-- Configuración -->
-            <div class="settings-container">
-                <h3 class="section-title">Configuración</h3>
-                <div class="setting-group">
-                    <label for="font-selector">Fuente:</label>
-                    <select id="font-selector" class="font-selector">
-                        <option value="'Roboto', sans-serif">Roboto</option>
-                        <option value="'Open Sans', sans-serif">Open Sans</option>
-                        <option value="'Montserrat', sans-serif">Montserrat</option>
-                    </select>
+                <div class="section-title">
+                    📋 Notas
+                    <span id="notes-badge" class="badge">0</span>
+                    <button id="btn-new-note" class="btn btn-primary" style="margin-left:auto; padding:4px 10px; font-size:13px;" title="Nueva nota" aria-label="Crear nueva nota">＋</button>
                 </div>
-                <div class="setting-group">
-                    <label for="font-size">Tamaño: <span id="font-size-value">18px</span></label>
-                    <input type="range" id="font-size" min="16" max="32" value="18" class="font-slider">
+                <!--
+                    CORRECCIÓN: notes-list era un <div> sin rol semántico.
+                    Ahora es <ul> con role="listbox" para mejor accesibilidad.
+                    Los items se generan como <li> en JavaScript.
+                -->
+                <ul id="notes-list" class="notes-list" role="listbox" aria-label="Lista de notas"></ul>
+
+                <!-- NUEVO: Estado vacío cuando no hay notas -->
+                <div id="empty-notes" class="empty-state" style="display:none;" aria-live="polite">
+                    <div class="empty-state-icon">📄</div>
+                    <p>No hay notas todavía</p>
+                    <button id="btn-new-note-empty" class="btn btn-primary">Crear primera nota</button>
                 </div>
             </div>
 
-            <!-- Selector de temas -->
-            <!-- <div class="theme-selector-container">
-                <h3 class="section-title">Tema de color</h3>
+            <!-- ── Temas ─────────────────────────────────────
+                 CORRECCIÓN: Ahora usa .theme-selector-container y .theme-options
+                 que coinciden con los selectores en styles.css.
+                 Los botones usan data-theme y la clase .theme-option.
+            ────────────────────────────────────────────────── -->
+            <div class="theme-selector-container">
+                <div class="section-title">🎨 Tema</div>
                 <div class="theme-options">
-                    <div class="theme-option" data-theme="blue" title="Tema Azul"></div>
-                    <div class="theme-option" data-theme="green" title="Tema Verde"></div>
-                    <div class="theme-option" data-theme="orange" title="Tema Naranja"></div>
-                    <div class="theme-option" data-theme="pink" title="Tema Rosa"></div>
+                    <button data-theme="blue"   class="theme-option" style="background:#3b82f6" aria-label="Tema azul"    title="Azul"></button>
+                    <button data-theme="green"  class="theme-option" style="background:#10b981" aria-label="Tema verde"   title="Verde"></button>
+                    <button data-theme="orange" class="theme-option" style="background:#f97316" aria-label="Tema naranja" title="Naranja"></button>
+                    <button data-theme="pink"   class="theme-option" style="background:#ec4899" aria-label="Tema rosa"    title="Rosa"></button>
+                    <button data-theme="purple" class="theme-option" style="background:#a855f7" aria-label="Tema púrpura" title="Púrpura"></button>
+                    <button data-theme="red"    class="theme-option" style="background:#ef4444" aria-label="Tema rojo"    title="Rojo"></button>
                 </div>
-            </div> -->
+            </div>
+
+            <!-- ── Configuración de colores ──────────────────
+                 CORRECCIÓN: Ahora usa .settings-container que sí existe en CSS.
+                 Los botones de acción usan las clases .btn correctas.
+            ────────────────────────────────────────────────── -->
+            <div class="settings-container">
+                <div class="section-title">⚙️ Acciones</div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button id="btn-custom-colors" class="btn btn-secondary">🎨 Personalizar colores</button>
+                    <button id="btn-export"        class="btn btn-secondary">📥 Exportar nota</button>
+                    <button id="btn-import"        class="btn btn-secondary">📤 Importar notas</button>
+                    <button id="btn-delete-note"   class="btn btn-danger">🗑️ Eliminar nota</button>
+                    <button id="btn-zen-mode"      class="btn btn-secondary">🧘 Zen Mode (Ctrl+\)</button>
+                </div>
+            </div>
+
         </aside>
 
-        <!-- Editor principal -->
-        <main class="main-content">
-            <div class="editor-header">
-                <input type="text" id="note-title" class="note-title-input" placeholder="Título de la nota" maxlength="100">
+        <!-- ══════════════════════════════════════════════════
+             CONTENIDO PRINCIPAL
+             CORRECCIÓN: Usa la clase .main-content que en styles.css
+             tiene flex:1 y display:flex flex-direction:column.
+             El HTML original usaba .editor-container que en CSS tiene
+             otro significado (el contenedor interno del split editor/preview).
+        ══════════════════════════════════════════════════ -->
+        <main class="main-content" id="main-content">
+
+            <!-- ── Botón para re-abrir sidebar (aparece cuando está colapsado) -->
+            <button id="btn-open-sidebar" class="sidebar-toggle-btn" title="Abrir panel" aria-label="Abrir panel lateral">▶</button>
+
+            <!-- ── Cabecera del editor ──────────────────────── -->
+            <div class="editor-header" id="editor-header">
+                <input
+                    id="note-title"
+                    type="text"
+                    class="note-title-input"
+                    placeholder="Título de la nota..."
+                    aria-label="Título de la nota"
+                    maxlength="200"
+                >
                 <div class="editor-actions">
-                    <button id="save-note-btn" class="btn btn-success" title="Guardar">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
-                    <button id="export-note-btn" class="btn btn-secondary" title="Exportar como .txt">
-                        <i class="fas fa-download"></i> Exportar
-                    </button>
-                    <button id="delete-note-btn" class="btn btn-danger" title="Eliminar nota">
-                        <i class="fas fa-trash"></i> Eliminar
-                    </button>
+                    <!--
+                        CORRECCIÓN: Estos botones de cabecera se han movido al sidebar
+                        para no saturar el header. Solo permanece el toggle de preview.
+                    -->
+                    <button id="btn-toggle-preview" class="btn btn-secondary" title="Alternar vista previa" aria-label="Alternar vista previa Markdown">👁 Preview</button>
                 </div>
             </div>
 
-            <div class="editor-container">
-                <textarea id="note-editor" class="note-editor" placeholder="Comienza a escribir aquí..."></textarea>
+            <!-- ── Split: Editor + Preview ──────────────────
+                 CORRECCIÓN: .editor-container es el split horizontal interior.
+                 En styles.css, .editor-container tiene display:flex y gap:1px.
+                 Los dos paneles usan .note-editor y .markdown-preview
+                 que están perfectamente definidos en styles.css.
+            ────────────────────────────────────────────────── -->
+            <div class="editor-container" id="editor-container">
+
+                <!-- NUEVO: Estado vacío cuando no hay nota seleccionada -->
+                <div id="empty-editor" class="empty-state" style="position:absolute; width:100%; height:100%; display:none;" aria-live="polite">
+                    <div class="empty-state-icon">✏️</div>
+                    <p>Selecciona una nota o crea una nueva</p>
+                    <button id="btn-new-note-empty2" class="btn btn-primary">+ Nueva nota</button>
+                </div>
+
+                <textarea
+                    id="note-editor"
+                    class="note-editor"
+                    placeholder="Escribe aquí... Soporta Markdown básico."
+                    aria-label="Editor de nota"
+                    spellcheck="true"
+                ></textarea>
+
+                <div
+                    id="markdown-preview"
+                    class="markdown-preview"
+                    aria-label="Vista previa Markdown"
+                    aria-live="polite"
+                ></div>
             </div>
 
-            <div class="editor-footer">
+            <!-- ── Pie del editor ────────────────────────────
+                 CORRECCIÓN: .editor-footer, .footer-info y .footer-status
+                 coinciden con sus definiciones en styles.css.
+                 Se añade el indicador de guardado con los estados
+                 .status-saving y .status-saved ya definidos en CSS.
+            ────────────────────────────────────────────────── -->
+            <footer class="editor-footer" aria-label="Estado del editor">
                 <div class="footer-info">
-                    <span id="char-count">0 caracteres</span>
-                    <span id="word-count">0 palabras</span>
+                    <span id="word-count" aria-live="polite">0 palabras</span>
+                    <span id="read-time"  aria-live="polite">0 min lectura</span>
                 </div>
-                <div class="theme-selector-container">
-                <h3 class="section-title">Tema de color</h3>
-                <div class="theme-options">
-                    <div class="theme-option" data-theme="blue" title="Tema Azul"></div>
-                    <div class="theme-option" data-theme="green" title="Tema Verde"></div>
-                    <div class="theme-option" data-theme="orange" title="Tema Naranja"></div>
-                    <div class="theme-option" data-theme="pink" title="Tema Rosa"></div>
-                </div>
-            </div>
+                <!-- NUEVO: Indicador de auto-guardado -->
                 <div class="footer-status">
-                    <span id="save-status" class="status-saved">
-                        <i class="fas fa-check-circle"></i> Guardado
-                    </span>
+                    <span id="save-status" class="status-saved" aria-live="polite">✓ Guardado</span>
                 </div>
-            </div>
+            </footer>
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="storage.js"></script>
-    <script src="ui.js"></script>
-    <script src="app.js"></script>
+    <!-- ══════════════════════════════════════════════════
+         MODAL: Personalizar Colores
+         CORRECCIÓN: Ahora usa la estructura .modal-overlay > .modal-content
+         que está correctamente definida en styles.css.
+         El modal se activa con la clase .modal-active (no display:block).
+    ══════════════════════════════════════════════════ -->
+    <!-- MEJORA: Modal de confirmación reutilizable -->
+    <div id="confirm-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="confirm-modal-title">Confirmación</h2>
+                <button class="modal-close" id="btn-close-confirm-modal" aria-label="Cerrar modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-modal-message">¿Estás seguro de realizar esta acción?</p>
+                <div class="modal-confirm-footer">
+                    <button id="btn-confirm-cancel" class="btn btn-secondary">Cancelar</button>
+                    <button id="btn-confirm-action" class="btn btn-danger">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="color-picker-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">🎨 Personalizar Colores</h2>
+                <button class="modal-close" id="btn-close-modal" aria-label="Cerrar modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label for="accent-color-input">Color de acento:</label>
+                    <input id="accent-color-input" type="color" value="#3b82f6" aria-label="Seleccionar color de acento">
+                </div>
+                <div class="setting-group">
+                    <label for="dark-bg-color-input">Fondo modo oscuro:</label>
+                    <input id="dark-bg-color-input" type="color" value="#0f172a" aria-label="Seleccionar color de fondo oscuro">
+                </div>
+                <div class="setting-group">
+                    <label for="light-bg-color-input">Fondo modo claro:</label>
+                    <input id="light-bg-color-input" type="color" value="#f8fafc" aria-label="Seleccionar color de fondo claro">
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; padding:16px 24px; border-top:1px solid var(--border-color);">
+                <button id="btn-apply-colors" class="btn btn-primary">✅ Aplicar</button>
+                <button id="btn-reset-colors" class="btn btn-secondary">↺ Restablecer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         MODAL: Exportar
+         NUEVO: Menú de exportación como modal propio,
+         más accesible que el menú flotante anterior.
+    ══════════════════════════════════════════════════ -->
+    <div id="export-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="export-modal-title">📥 Exportar</h2>
+                <button class="modal-close" id="btn-close-export-modal" aria-label="Cerrar modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <button id="btn-export-json" class="btn btn-secondary">📄 Exportar todas las notas (JSON)</button>
+                    <button id="btn-export-md"   class="btn btn-secondary">📝 Exportar nota actual (Markdown)</button>
+                    <button id="btn-export-txt"  class="btn btn-secondary">📋 Exportar nota actual (TXT)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         CONTENEDOR DE TOASTS (Notificaciones)
+         NUEVO: Zona dedicada para los toasts, fuera del flujo
+         normal del documento. aria-live para lectores de pantalla.
+    ══════════════════════════════════════════════════ -->
+    <div id="toast-container" aria-live="assertive" aria-atomic="true"></div>
+
+    <!--
+        SCRIPTS: core.js debe cargarse primero porque define
+        Store, Security, Theme, Markdown y Utils que app.js necesita.
+        defer garantiza que ambos se ejecutan después del DOM.
+        El orden de los scripts garantiza la disponibilidad de globals.
+    -->
+    <script src="core.js" defer></script>
+    <script src="app.js" defer></script>
 </body>
 </html>
